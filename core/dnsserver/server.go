@@ -184,6 +184,12 @@ func (s *Server) ServePacket(p net.PacketConn) error {
 
 // Listen implements caddy.TCPServer interface.
 func (s *Server) Listen() (net.Listener, error) {
+	log.Debugf("---tcp Listen: address: %+v;", s.Address())
+
+	for k, v := range s.zones {
+		log.Debugf("---tcp ListenPacket zones: k: %+v; v: %+v", k, v)
+	}
+
 	l, err := reuseport.Listen("tcp", s.Addr[len(transport.DNS+"://"):])
 	if err != nil {
 		return nil, err
@@ -198,6 +204,13 @@ func (s *Server) WrapListener(ln net.Listener) net.Listener {
 
 // ListenPacket implements caddy.UDPServer interface.
 func (s *Server) ListenPacket() (net.PacketConn, error) {
+
+	log.Debugf("---udp ListenPacket: address: %+v;", s.Address())
+
+	for k, v := range s.zones {
+		log.Debugf("---udp ListenPacket zones: k: %+v; v: %+v", k, v)
+	}
+
 	p, err := reuseport.ListenPacket("udp", s.Addr[len(transport.DNS+"://"):])
 	if err != nil {
 		return nil, err

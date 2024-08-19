@@ -68,12 +68,16 @@ func Run() {
 		mustLogFatal(err)
 	}
 
+	log.Printf("servers: %+v;\n", instance.Servers())
+
 	if !dnsserver.Quiet {
 		showVersion()
 	}
 
 	// Twiddle your thumbs
 	instance.Wait()
+
+	log.Printf("start last len ;\n")
 }
 
 // mustLogFatal wraps log.Fatal() in a way that ensures the
