@@ -22,6 +22,8 @@ type Hosts struct {
 
 // ServeDNS implements the plugin.Handle interface.
 func (h Hosts) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) (int, error) {
+	log.Debug("🥝 on ServeDNS hosts")
+
 	state := request.Request{W: w, Req: r}
 	qname := state.Name()
 

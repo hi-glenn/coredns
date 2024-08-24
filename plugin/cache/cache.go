@@ -58,6 +58,8 @@ type Cache struct {
 // New returns an initialized Cache with default settings. It's up to the
 // caller to set the Next handler.
 func New() *Cache {
+	log.Debug("cache New()")
+
 	return &Cache{
 		Zones:      []string{"."},
 		pcap:       defaultCap,
@@ -80,6 +82,7 @@ func New() *Cache {
 // Currently we do not cache Truncated, errors zone transfers or dynamic update messages.
 // qname holds the already lowercased qname.
 func key(qname string, m *dns.Msg, t response.Type, do, cd bool) (bool, uint64) {
+	log.Debug("cache key")
 	// We don't store truncated responses.
 	if m.Truncated {
 		return false, 0
@@ -182,6 +185,7 @@ func (w *ResponseWriter) RemoteAddr() net.Addr {
 
 // WriteMsg implements the dns.ResponseWriter interface.
 func (w *ResponseWriter) WriteMsg(res *dns.Msg) error {
+	log.Debug("cache WriteMsg")
 	mt, _ := response.Typify(res, w.now().UTC())
 
 	// key returns empty string for anything we don't want to cache.

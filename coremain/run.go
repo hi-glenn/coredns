@@ -68,7 +68,9 @@ func Run() {
 		mustLogFatal(err)
 	}
 
-	log.Printf("servers: %+v;\n", instance.Servers())
+	for inx, v := range instance.Servers() {
+		log.Printf("🍏 coremain/run.go inx: %d; server: %+v, %+v, %+v;\n", inx, v.Addr().Network(), v.Addr(), v.LocalAddr())
+	}
 
 	if !dnsserver.Quiet {
 		showVersion()

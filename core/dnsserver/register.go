@@ -8,6 +8,7 @@ import (
 	"github.com/coredns/caddy"
 	"github.com/coredns/caddy/caddyfile"
 	"github.com/coredns/coredns/plugin"
+	"github.com/coredns/coredns/plugin/pkg/log"
 	"github.com/coredns/coredns/plugin/pkg/parse"
 	"github.com/coredns/coredns/plugin/pkg/transport"
 
@@ -134,6 +135,7 @@ func (h *dnsContext) InspectServerBlocks(sourceFile string, serverBlocks []caddy
 
 // MakeServers uses the newly-created siteConfigs to create and return a list of server instances.
 func (h *dnsContext) MakeServers() ([]caddy.Server, error) {
+	log.Debugf("🔵 core dnserver/register.go MakeServers()")
 	// Copy the Plugin, ListenHosts and Debug from first config in the block
 	// to all other config in the same block . Doing this results in zones
 	// sharing the same plugin instances and settings as other zones in

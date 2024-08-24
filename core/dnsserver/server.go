@@ -146,8 +146,11 @@ var _ caddy.GracefulServer = &Server{}
 // Serve starts the server with an existing listener. It blocks until the server stops.
 // This implements caddy.TCPServer interface.
 func (s *Server) Serve(l net.Listener) error {
+	log.Debug("dnsserver/server.go-----Serve --- TCP")
+
 	s.m.Lock()
 
+	log.Debug("🍊 dnsserver/server.go-----set plugin chain --- TCP")
 	s.server[tcp] = &dns.Server{Listener: l,
 		Net:           "tcp",
 		TsigSecret:    s.tsigSecret,
@@ -171,7 +174,13 @@ func (s *Server) Serve(l net.Listener) error {
 // ServePacket starts the server with an existing packetconn. It blocks until the server stops.
 // This implements caddy.UDPServer interface.
 func (s *Server) ServePacket(p net.PacketConn) error {
+	log.Debug("dnsserver/server.go-----ServePacket --- UDP")
+
 	s.m.Lock()
+
+	// 设置 plugin chain
+	log.Debug("🍊 dnsserver/server.go-----set plugin chain --- UDP")
+
 	s.server[udp] = &dns.Server{PacketConn: p, Net: "udp", Handler: dns.HandlerFunc(func(w dns.ResponseWriter, r *dns.Msg) {
 		ctx := context.WithValue(context.Background(), Key{}, s)
 		ctx = context.WithValue(ctx, LoopKey{}, 0)
@@ -184,10 +193,10 @@ func (s *Server) ServePacket(p net.PacketConn) error {
 
 // Listen implements caddy.TCPServer interface.
 func (s *Server) Listen() (net.Listener, error) {
-	log.Debugf("---tcp Listen: address: %+v;", s.Address())
+	log.Debugf("🔵 dnsserver/server.go ---tcp Listen: address: %+v;", s.Address())
 
 	for k, v := range s.zones {
-		log.Debugf("---tcp ListenPacket zones: k: %+v; v: %+v", k, v)
+		log.Debugf("🔵 ---tcp ListenPacket zones: k: %+v; v: %+v", k, v)
 	}
 
 	l, err := reuseport.Listen("tcp", s.Addr[len(transport.DNS+"://"):])
@@ -205,10 +214,10 @@ func (s *Server) WrapListener(ln net.Listener) net.Listener {
 // ListenPacket implements caddy.UDPServer interface.
 func (s *Server) ListenPacket() (net.PacketConn, error) {
 
-	log.Debugf("---udp ListenPacket: address: %+v;", s.Address())
+	log.Debugf("🔵 dnsserver/server.go ---udp ListenPacket: address: %+v;", s.Address())
 
 	for k, v := range s.zones {
-		log.Debugf("---udp ListenPacket zones: k: %+v; v: %+v", k, v)
+		log.Debugf("🔵 ---udp ListenPacket zones: k: %+v; v: %+v", k, v)
 	}
 
 	p, err := reuseport.ListenPacket("udp", s.Addr[len(transport.DNS+"://"):])
@@ -263,6 +272,9 @@ func (s *Server) Address() string { return s.Addr }
 // defined in the request so that the correct zone
 // (configuration and plugin stack) will handle the request.
 func (s *Server) ServeDNS(ctx context.Context, w dns.ResponseWriter, r *dns.Msg) {
+
+	log.Debug("core/dnsserver 🥝 on ServeDNS core")
+
 	// The default dns.Mux checks the question section size, but we have our
 	// own mux here. Check if we have a question section. If not drop them here.
 	if r == nil || len(r.Question) == 0 {

@@ -14,6 +14,7 @@ import (
 	"github.com/coredns/coredns/plugin/metrics/vars"
 	"github.com/coredns/coredns/plugin/pkg/dnsutil"
 	"github.com/coredns/coredns/plugin/pkg/doh"
+	"github.com/coredns/coredns/plugin/pkg/log"
 	clog "github.com/coredns/coredns/plugin/pkg/log"
 	"github.com/coredns/coredns/plugin/pkg/response"
 	"github.com/coredns/coredns/plugin/pkg/reuseport"
@@ -43,6 +44,8 @@ type HTTPRequestKey struct{}
 
 // NewServerHTTPS returns a new CoreDNS HTTPS server and compiles all plugins in to it.
 func NewServerHTTPS(addr string, group []*Config) (*ServerHTTPS, error) {
+	log.Debug("🔵 core server_https.go NewServerHTTPS()")
+
 	s, err := NewServer(addr, group)
 	if err != nil {
 		return nil, err
@@ -93,6 +96,8 @@ var _ caddy.GracefulServer = &Server{}
 
 // Serve implements caddy.TCPServer interface.
 func (s *ServerHTTPS) Serve(l net.Listener) error {
+	log.Debugf("🔵 core dnsserver/server_https.go ---https Serve(): address: %+v;", s.Address())
+
 	s.m.Lock()
 	s.listenAddr = l.Addr()
 	s.m.Unlock()
@@ -108,6 +113,8 @@ func (s *ServerHTTPS) ServePacket(p net.PacketConn) error { return nil }
 
 // Listen implements caddy.TCPServer interface.
 func (s *ServerHTTPS) Listen() (net.Listener, error) {
+	log.Debugf("🔵 dnsserver/server_https.go ---https Listen(): address: %+v;", s.Address())
+
 	l, err := reuseport.Listen("tcp", s.Addr[len(transport.HTTPS+"://"):])
 	if err != nil {
 		return nil, err
@@ -144,6 +151,8 @@ func (s *ServerHTTPS) Stop() error {
 // ServeHTTP is the handler that gets the HTTP request and converts to the dns format, calls the plugin
 // chain, converts it back and write it to the client.
 func (s *ServerHTTPS) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	log.Debug("🔵 core server_https.go ServeHTTP; listen: ", s.listenAddr.String())
+
 	if !s.validRequest(r) {
 		http.Error(w, "", http.StatusNotFound)
 		s.countResponse(http.StatusNotFound)

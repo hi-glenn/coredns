@@ -40,6 +40,10 @@ require (
 	k8s.io/utils v0.0.0-20230726121419-3b25d923346b
 )
 
+replace github.com/coredns/caddy v1.1.1 => ./caddy
+
+replace github.com/miekg/dns v1.1.58 => ./dns
+
 require (
 	cloud.google.com/go/compute v1.24.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
